@@ -21,19 +21,15 @@ class Question(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, NULL=True, on_delete=models.SET_NULL)
     qualifications = models.CharField(max_length=200)
     answer_text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.answer_text, self.user
-
     def __unicode__(self):
-        return "Answer by %s on question %s" % (self.user,
-                                            self.question.title)
-
-
+        return self.answer_text, self.user, ("Answer by %s on question %s" % (self.user,
+                                            self.question.title))
+        
 class Comment(models.Model):
     answer = models.ForeignKey(Answer)
     user = models.ForeignKey(User)
@@ -44,12 +40,12 @@ class Comment(models.Model):
         return self.body, self.user
 
     def __unicode__(self):
-        return "Comment by %s on answer %s" % (self.user,
-                                            self.answer.title)
+        return self.body, self.user, ("Comment by %s on answer %s" % (self.user,
+                                            self.answer.title))
 
-
+    
 class Vote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, NULL=True, on_delete=models.SET_NULL)
     answer = models.ForeignKey(Answer)
     comment = models.ForeignKey(Comment)
     value = models.IntegerField(default=0)
@@ -61,10 +57,14 @@ class Vote(models.Model):
     def downvote(self):
         self.value -= 1
 
+    def __unicode__(self):
+        pass
+
 
 class Follow(models.Model):
     follow_time = models.DateTimeField(auto_now_add=True)
-    pass
+    following = models.ForeignKey(User)
+    follower = models.ForeignKey(User)
 
 
 class Profile(models.Model):
